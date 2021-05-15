@@ -1,7 +1,6 @@
 // result1.rs
 // Make this test pass! Execute `rustlings hint result1` for hints :)
 
-
 #[derive(PartialEq, Debug)]
 struct PositiveNonzeroInteger(u64);
 
@@ -15,10 +14,11 @@ impl PositiveNonzeroInteger {
     fn new(value: i64) -> Result<PositiveNonzeroInteger, CreationError> {
         if (value < 0) {
             Err(CreationError::Negative)
-        } if (value === 0) {
+        } else if (value == 0) {
             Err(CreationError::Zero)
+        } else {
+            Ok(PositiveNonzeroInteger(value as u64))
         }
-        Ok(PositiveNonzeroInteger(value as u64))
     }
 }
 

@@ -4,6 +4,7 @@
 // You can read more about it at https://doc.rust-lang.org/std/convert/trait.TryFrom.html
 use std::convert::{TryFrom, TryInto};
 use std::error;
+use std::fmt;
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -11,6 +12,13 @@ struct Color {
     green: u8,
     blue: u8,
 }
+impl fmt::Display for Color {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "There is an error: {}", self)
+    }
+}
+
+impl error::Error for Color {}
 
 // I AM NOT DONE
 
@@ -23,22 +31,92 @@ struct Color {
 // but the slice implementation needs to check the slice length!
 // Also note that correct RGB color values must be integers in the 0..=255 range.
 
+const MIN: i16 = 0;
+const MAX: i16 = 255;
+const error_message: &str = "Color value is out of range! Expected 0..=255, but got ";
+
 // Tuple implementation
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = Box<dyn error::Error>;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {}
+    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+
+        let r = u8::try_from(tuple.0);
+        let g = u8::try_from(tuple.1);
+        let b = u8::try_from(tuple.2);
+        if r.is_err() || g.is_err() || b.is_err() {
+            return Err(Box::new(Color{
+                red: 0u8,
+                green: 0u8,
+                blue: 0u8,
+            }));
+        };
+        Ok(Color{
+            red: r.unwrap(),
+            green: g.unwrap(),
+            blue: b.unwrap(),
+        })
+    }
 }
+
 
 // Array implementation
 impl TryFrom<[i16; 3]> for Color {
     type Error = Box<dyn error::Error>;
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {}
+    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        let r = u8::try_from(arr[0]);
+        let g = u8::try_from(arr[1]);
+        let b = u8::try_from(arr[2]);
+        if r.is_err() || g.is_err() || b.is_err() {
+            return Err(Box::new(Color {
+                red: 0u8,
+                green: 0u8,
+                blue: 0u8,
+            }))
+        };
+        return Ok(Color {
+            red: r.unwrap(),
+            green: g.unwrap(), 
+            blue: b.unwrap(),
+        })
+    }
 }
 
 // Slice implementation
 impl TryFrom<&[i16]> for Color {
     type Error = Box<dyn error::Error>;
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {}
+    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() < 3 {
+            return Err(Box::new(Color {
+                red: 0u8,
+                green: 0u8,
+                blue: 0u8,
+            }))
+        };
+            let r = u8::try_from(slice[0]);
+            let g = u8::try_from(slice[1]);
+            let b = u8::try_from(slice[2]);
+        if r.is_err() || g.is_err() || b.is_err() {
+            return Err(Box::new(Color {
+                red: 0u8,
+                green: 0u8,
+                blue: 0u8,
+            }))
+        };
+        match slice.len() {
+            3 => Ok(
+                Color{
+                    red: r.unwrap(),
+                    green: g.unwrap(),
+                    blue: b.unwrap(),
+                }
+            ),
+            _ => Err(Box::new(Color {
+                red: 0u8,
+                green: 0u8,
+                blue: 0u8,
+            }))
+        }
+    }
 }
 
 fn main() {

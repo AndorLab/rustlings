@@ -20,7 +20,6 @@ impl fmt::Display for Color {
 
 impl error::Error for Color {}
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation
 // and return an Ok result of inner type Color.

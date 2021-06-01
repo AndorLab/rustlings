@@ -4,6 +4,7 @@
 // You can read more about it at https://doc.rust-lang.org/std/str/trait.FromStr.html
 use std::error;
 use std::str::FromStr;
+use std::fmt;
 
 #[derive(Debug)]
 struct Person {
@@ -11,7 +12,12 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
+impl fmt::Display for Person {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "There is an error: {}", self)
+    }
+}
+impl error::Error for Person {}
 
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
@@ -26,6 +32,18 @@ struct Person {
 impl FromStr for Person {
     type Err = Box<dyn error::Error>;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
+        let v: Vec<&str> = s.split(",").collect();
+        if v.len() <= 1 || v.len() > 2 || v[0].len() <= 0 || v[1].len() <= 0 || String::from_str(v[0]).is_err() || usize::from_str(v[1]).is_err() {
+            return Err(Box::new(Person {
+                name: String::from("name"),
+                age: 0usize,
+            }))
+        } else {
+            return Ok(Person {
+                name: v[0].to_string(),
+                age: v[1].parse::<usize>().unwrap()
+            })
+        }
     }
 }
 
